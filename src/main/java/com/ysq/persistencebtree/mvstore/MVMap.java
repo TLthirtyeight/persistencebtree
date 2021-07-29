@@ -1,6 +1,8 @@
 package com.ysq.persistencebtree.mvstore;
 
 import com.ysq.persistencebtree.common.DataUtils;
+
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.util.AbstractList;
 import java.util.AbstractMap;
@@ -290,7 +292,8 @@ public class MVMap extends AbstractMap<String, String> implements ConcurrentMap<
             x = high >>> 1;
         }
         while (low <= high) {
-            int compare = key.compareTo(storage[x]);
+            // int compare = key.compareTo(storage[x]);
+            int compare = compareString(key, storage[x]);
             if (compare > 0) {
                 low = x + 1;
             } else if (compare < 0) {
@@ -301,6 +304,22 @@ public class MVMap extends AbstractMap<String, String> implements ConcurrentMap<
             x = (low + high) >>> 1;
         }
         return -(low + 1);
+    }
+
+    public int compareString(String key, String other) {
+        if (isNumeric(key)) {
+            return new BigDecimal(key).compareTo(new BigDecimal(other));
+        }
+        return key.compareTo(other);
+    }
+    private boolean isNumeric(String str) {
+        String bigStr;
+        try {
+            bigStr = new BigDecimal(str).toString();
+        } catch (Exception e) {
+            return false;//异常 说明包含非数字。
+        }
+        return true;
     }
 
     /**

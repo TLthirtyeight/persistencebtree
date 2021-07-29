@@ -15,6 +15,7 @@ import java.util.LinkedList;
  */
 public class MVMapTest {
     private static String MVDBFILE = "F:/h2data_1/test9.mv.db";
+
     @Test
     public static void testOpenMVMap() {
         String fileName = MVDBFILE;
@@ -22,7 +23,7 @@ public class MVMapTest {
 
         MVStore s = MVStore.open(fileName);
         MVMap map = s.openMap("data");
-        for (int i = 0; i < 30000; i++) {
+        for (int i = 0; i < 300; i++) {
             map.put(i + "", i + "");
         }
         s.commit();
