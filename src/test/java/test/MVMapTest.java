@@ -84,7 +84,7 @@ public class MVMapTest {
     public static void main(String[] args) {
         testOpenMVMap();
         //testReadMVMap();
-        testReadAllPage();
+       // testReadAllPage();
     }
 }
 

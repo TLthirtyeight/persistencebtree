@@ -1,0 +1,22 @@
+.button {
+	-fx-background-color: #476c98;
+	-fx-background-radius: 3;
+	-fx-font-weight: bold;
+	-fx-font-size:12;
+	-fx-text-fill:white;
+	-fx-border-color: #476c98;
+	-fx-border-radius: 3;
+	-fx-border-width:1;
+}
+.button:hover{
+	-fx-background-color: white;
+	-fx-text-fill: #476c98;
+}
+#reset {
+	-fx-border-color: #f57f7f;
+	-fx-background-color: #f57f7f;
+}
+#reset:hover {
+	-fx-background-color: white;
+	-fx-text-fill: #f57f7f;
+}
