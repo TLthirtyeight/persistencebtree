@@ -77,10 +77,15 @@ public class PersistenceBtreeApp extends Application {
             }
             BPlusTree<String> bTree = initBtree(h2StoreFile.getText());
 
+            ScrollPane scrollPane = new ScrollPane();
+
             PersistenceBTreePane persistenceBTreePane = new PersistenceBTreePane(windowWidth / 2, 50, bTree);
-            root.setCenter(persistenceBTreePane);
+
             persistenceBTreePane.setPrefSize(windowWidth, windowHeight);
             persistenceBTreePane.drawBTree(bTree.getRoot(), windowWidth / 2, 80);
+
+            scrollPane.setContent(persistenceBTreePane);
+            root.setCenter(scrollPane);
         });
 
         // Create a scene
