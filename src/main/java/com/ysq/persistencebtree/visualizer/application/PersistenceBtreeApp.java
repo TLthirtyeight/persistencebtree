@@ -81,10 +81,11 @@ public class PersistenceBtreeApp extends Application {
 
             PersistenceBTreePane persistenceBTreePane = new PersistenceBTreePane(windowWidth / 2, 50, bTree);
 
-            persistenceBTreePane.setPrefSize(windowWidth, windowHeight);
+            // 去掉 persistenceBTreePane.setPrefSize(windowWidth, windowHeight);
             persistenceBTreePane.drawBTree(bTree.getRoot(), windowWidth / 2, 80);
 
             scrollPane.setContent(persistenceBTreePane);
+            scrollPane.autosize();
             root.setCenter(scrollPane);
         });
 
