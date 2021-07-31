@@ -92,7 +92,8 @@ public class PersistenceBTreePane extends Pane {
 				for (int i = 0; i < tmpList.size(); i++) {
 					drawNode(tmpList.get(i), rectangleX, recttangleY, Color.web("#6ab5ff"));
 					markDownNodeLocation(tmpList.get(i), rectangleX, recttangleY);
-					rectangleX += ((tmpList.get(i).getSize() * rectangleWidth) * 3);
+					//rectangleX += ((tmpList.get(i).getSize() * rectangleWidth) * 3);
+					rectangleX += ((tmpList.get(i).getSize() * rectangleWidth) + rectangleWidth);
 				}
 			}
 

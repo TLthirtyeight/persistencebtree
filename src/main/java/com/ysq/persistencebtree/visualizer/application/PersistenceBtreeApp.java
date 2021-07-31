@@ -13,10 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
@@ -37,7 +34,7 @@ public class PersistenceBtreeApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         final int windowHeight = 1040;
-        final int windowWidth = 720;
+        final int windowWidth = 7200;
 
 
         BorderPane root = new BorderPane();
@@ -79,6 +76,7 @@ public class PersistenceBtreeApp extends Application {
                 return;
             }
             BPlusTree<String> bTree = initBtree(h2StoreFile.getText());
+
             PersistenceBTreePane persistenceBTreePane = new PersistenceBTreePane(windowWidth / 2, 50, bTree);
             root.setCenter(persistenceBTreePane);
             persistenceBTreePane.setPrefSize(windowWidth, windowHeight);
