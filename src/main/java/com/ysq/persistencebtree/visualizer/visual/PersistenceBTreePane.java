@@ -18,9 +18,9 @@ public class PersistenceBTreePane extends Pane {
 
 	// TODO: make node size relate to pane's size
 	private final int fontSize = 14;
-	private final int rectangleWidth = 30;
+	private final int rectangleWidth = 40;
 
-	private final int levelVerticalDist = 5 * rectangleWidth;
+	private final int levelVerticalDist = 10 * rectangleWidth;
 
 	private final int levelPaddingLeftDist = 5 * rectangleWidth;
 

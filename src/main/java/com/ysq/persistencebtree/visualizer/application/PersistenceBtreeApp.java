@@ -31,6 +31,8 @@ public class PersistenceBtreeApp extends Application {
 
     private TextField h2StoreFile = new TextField();
 
+    private BTNode<String> rootNode = new BTNode<>();
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         final int windowHeight = 1040;
@@ -116,54 +118,43 @@ public class PersistenceBtreeApp extends Application {
         MVMap map = s.openMap("data");
 
         Page rootPage = map.getRootPage();
-        LinkedList<Page> queue = new LinkedList<>();
-        queue.add(rootPage);
 
-        Map<Page, List<Page>> childs = new HashMap<>();
 
-        int pageCount = 0;
-        while (!queue.isEmpty()) {
-            int size = queue.size();
-            for (int i = 0; i < size; i++) {
-                Page tmpPage = queue.pollFirst();
-                pageCount++;
+        BPlusTree<String> bTree = initBtreeDFS(rootPage);
 
-                if (!tmpPage.isLeaf()) {
-                    for (int j = 0; j < tmpPage.getKeyCount() + 1; j++) {
-                        Page c = tmpPage.getChildPage(j);
-                        queue.add(c);
-                        List<Page> childrens = childs.getOrDefault(tmpPage, new ArrayList<>());
-                        childrens.add(c);
-                        childs.put(tmpPage, childrens);
-                    }
-                }
-            }
-        }
-
-        BPlusTree<String> bTree = new BPlusTree<>();
-        Iterator<Page> iterator = childs.keySet().iterator();
-        while (iterator.hasNext()) {
-            Page p = iterator.next();
-            BTNode<String> tmpNode = new BTNode<>();
-            for (int i = 0; i < p.getKeyCount(); i++) {
-                tmpNode.addKey(i, p.getKey(i));
-            }
-            List<Page> childrens = childs.get(p);
-            for (int i = 0; i < childrens.size(); i++) {
-                Page childPage = childrens.get(i);
-                BTNode<String> childNode = new BTNode<>();
-                for (int j = 0; j < childPage.getKeyCount(); j++) {
-                    childNode.addKey(j, childPage.getKey(j));
-                }
-                tmpNode.addChild(i, childNode);
-            }
-            if (p == rootPage) {
-                bTree.setRoot(tmpNode);
-            }
-        }
 
         return bTree;
     }
+
+    private BPlusTree<String> initBtreeDFS(Page page) {
+        solve(page, null);
+        BPlusTree<String> bPlusTree = new BPlusTree<>();
+        bPlusTree.setRoot(rootNode);
+        return bPlusTree;
+    }
+
+    private void solve(Page page, BTNode<String> parent) {
+        if (page == null) {
+            return;
+        }
+        BTNode<String> node = new BTNode<>();
+        for (int j = 0; j < page.getKeyCount(); j++) {
+            node.addKey(j, page.getKey(j));
+        }
+        if (parent == null) {
+            rootNode = node;
+        }
+        if (parent != null) {
+            parent.addChild(node);
+        }
+        if (!page.isLeaf()) {
+            for (int j = 0; j < page.getKeyCount() + 1; j++) {
+                Page tmpPage = page.getChildPage(j);
+                solve(tmpPage, node);
+            }
+        }
+    }
+
 
     private BPlusTree<String> initBtree() {
         BPlusTree<String> bPlusTree = new BPlusTree<>();

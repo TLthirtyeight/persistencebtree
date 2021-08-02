@@ -45,10 +45,10 @@ public class BTNode<E extends Comparable<E>> implements Serializable {
     }
 
     public ArrayList<BTNode<E>> getChildren() {
-		return children;
-	}
+        return children;
+    }
 
-	/**
+    /**
      * @param index the index to get
      * @return the child
      */
@@ -63,6 +63,13 @@ public class BTNode<E extends Comparable<E>> implements Serializable {
     public void addChild(int index, BTNode<E> node) {
         node.setFather(this);
         children.add(index, node);
+    }
+
+    public void addChild(BTNode<E> node) {
+        node.setFather(this);
+        if (node != null) {
+            children.add(node);
+        }
     }
 
     /**
@@ -94,12 +101,12 @@ public class BTNode<E extends Comparable<E>> implements Serializable {
     public void removeKey(int index) {
         keys.remove(index);
     }
-    
-    public ArrayList<E> getKeys() {
-		return keys;
-	}
 
-	/**
+    public ArrayList<E> getKeys() {
+        return keys;
+    }
+
+    /**
      * @return true, if keys.size() == order - 1
      */
     public boolean isFull() {

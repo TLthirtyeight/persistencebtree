@@ -14,7 +14,7 @@ import java.util.LinkedList;
  * @since 2021/7/10
  */
 public class MVMapTest {
-    private static String MVDBFILE = "F:/h2data_1/test11.mv.db";
+    private static String MVDBFILE = "F:/h2data_1/test12.mv.db";
 
     @Test
     public static void testOpenMVMap() {
@@ -23,7 +23,7 @@ public class MVMapTest {
 
         MVStore s = MVStore.open(fileName);
         MVMap map = s.openMap("data");
-        for (int i = 0; i < 30000; i++) {
+        for (int i = 0; i < 6000; i++) {
             map.put(i + "", i + "");
         }
         s.commit();
@@ -84,7 +84,7 @@ public class MVMapTest {
     public static void main(String[] args) {
         testOpenMVMap();
         //testReadMVMap();
-       // testReadAllPage();
+        testReadAllPage();
     }
 }
 
