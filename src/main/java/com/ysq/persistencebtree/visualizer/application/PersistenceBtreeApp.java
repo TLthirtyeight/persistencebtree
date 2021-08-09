@@ -77,7 +77,8 @@ public class PersistenceBtreeApp extends Application {
             if (!checkH2DBFile()) {
                 return;
             }
-            BPlusTree<String> bTree = initBtree(h2StoreFile.getText());
+            //BPlusTree<String> bTree = initBtree(h2StoreFile.getText());
+            BPlusTree<String> bTree = initBtree2(3, 3);
 
             ScrollPane scrollPane = new ScrollPane();
 
@@ -205,6 +206,120 @@ public class PersistenceBtreeApp extends Application {
 
         c4.addChild(0, c5);
 
+        return bPlusTree;
+    }
+
+    private BPlusTree<String> initBtree1() {
+        BPlusTree<String> bPlusTree = new BPlusTree<>();
+        BTNode<String> root = new BTNode<>();
+        bPlusTree.setRoot(root);
+
+        for (int i = 0; i < 4; i++) {
+            root.addKey(i, i + "");
+        }
+
+
+        BTNode<String> c1 = new BTNode<>();
+        for (int i = 0; i < 4; i++) {
+            c1.addKey(i, i + "");
+        }
+        root.addChild(0, c1);
+
+        BTNode<String> c2 = new BTNode<>();
+        for (int i = 0; i < 4; i++) {
+            c2.addKey(i, i + "");
+        }
+        root.addChild(1, c2);
+
+        BTNode<String> c3 = new BTNode<>();
+        for (int i = 0; i < 4; i++) {
+            c3.addKey(i, i + "");
+        }
+        root.addChild(2, c3);
+
+        BTNode<String> c4 = new BTNode<>();
+        for (int i = 0; i < 4; i++) {
+            c4.addKey(i, i + "");
+        }
+        root.addChild(3, c4);
+
+        BTNode<String> c5 = new BTNode<>();
+        for (int i = 0; i < 4; i++) {
+            c5.addKey(i, i + "");
+        }
+        root.addChild(4, c5);
+
+        BTNode<String> c11 = new BTNode<>();
+        for (int i = 0; i < 4; i++) {
+            c11.addKey(i, i + "");
+        }
+        c1.addChild(0, c11);
+
+        BTNode<String> c12 = new BTNode<>();
+        for (int i = 0; i < 4; i++) {
+            c12.addKey(i, i + "");
+        }
+        c1.addChild(1, c12);
+
+        BTNode<String> c13 = new BTNode<>();
+        for (int i = 0; i < 4; i++) {
+            c13.addKey(i, i + "");
+        }
+        c1.addChild(1, c13);
+
+        BTNode<String> c14 = new BTNode<>();
+        for (int i = 0; i < 4; i++) {
+            c14.addKey(i, i + "");
+        }
+        c1.addChild(1, c14);
+
+        BTNode<String> c15 = new BTNode<>();
+        for (int i = 0; i < 4; i++) {
+            c15.addKey(i, i + "");
+        }
+        c1.addChild(1, c15);
+
+
+        return bPlusTree;
+    }
+
+    /**
+     * 根据每个节点的阶数和层数构造数
+     *
+     * @param m 阶数，每个节点的key数
+     * @param level 层数
+     * @return B+树
+     */
+    private BPlusTree<String> initBtree2(int m, int level) {
+        BPlusTree<String> bPlusTree = new BPlusTree<>();
+
+
+        List<BTNode<String>> btNodes = new ArrayList<>();
+
+        int levelCount = 1;
+        for (int i = 1; i <= level; i++) {
+            for (int j = 0; j < levelCount; j++) {
+                BTNode<String> c = new BTNode<>();
+                for (int l = 0; l < m; l++) {
+                    c.addKey(l, l + "");
+                }
+                btNodes.add(c);
+            }
+            levelCount = levelCount * (m + 1);
+        }
+
+        BTNode<String> root = btNodes.get(0);
+        bPlusTree.setRoot(root);
+
+        for (int i = 0; i < btNodes.size(); i++) {
+            BTNode<String> parent = btNodes.get(i);
+            if (i * (m + 1) + 1 < btNodes.size()) {
+                int childIndex = i * (m + 1) + 1;
+                for (int j = 0; j < m + 1; j++) {
+                    parent.addChild(btNodes.get(childIndex++));
+                }
+            }
+        }
         return bPlusTree;
     }
 }
