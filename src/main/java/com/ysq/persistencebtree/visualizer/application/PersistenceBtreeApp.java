@@ -77,8 +77,8 @@ public class PersistenceBtreeApp extends Application {
             if (!checkH2DBFile()) {
                 return;
             }
-            //BPlusTree<String> bTree = initBtree(h2StoreFile.getText());
-            BPlusTree<String> bTree = initBtree2(3, 3);
+            BPlusTree<String> bTree = initBtree(h2StoreFile.getText());
+            //BPlusTree<String> bTree = initBtree2(3, 3);
 
             ScrollPane scrollPane = new ScrollPane();
 

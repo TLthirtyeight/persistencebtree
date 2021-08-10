@@ -100,8 +100,9 @@ public class PersistenceBTreePane extends Pane {
                 if (currentLevel == level - 1) {
                     int rectangleX = (level - 1 - currentLevel) * levelPaddingLeftDist + rectangleWidth;
                     for (int i = 0; i < tmpList.size(); i++) {
-                        drawNode(tmpList.get(i), rectangleX, recttangleY, Color.web("#6ab5ff"));
-                        markDownNodeLocation(tmpList.get(i), rectangleX, recttangleY, i);
+                        BTNode<String> btNode = tmpList.get(i);
+                        drawNode(btNode, rectangleX, recttangleY, Color.web("#6ab5ff"));
+                        markDownNodeLocation(tmpList.get(i), rectangleX, recttangleY, findChildIndex(btNode.getFather(), btNode));
                         //rectangleX += ((tmpList.get(i).getSize() * rectangleWidth) * 3);
                         rectangleX += ((tmpList.get(i).getSize() * rectangleWidth) + rectangleWidth);
                     }
@@ -114,9 +115,9 @@ public class PersistenceBTreePane extends Pane {
                     int[] location = nodeLocationMap.get(middleChildNode);
                     int rectangleX = location[0];
                     drawNode(btNode, rectangleX, recttangleY, Color.web("#6ab5ff"));
-                    markDownNodeLocation(btNode, rectangleX, recttangleY, i);
-                    //rectangleX += ((tmpList.get(i).getSize() * rectangleWidth) * 3);
-                   // rectangleX += ((tmpList.get(i).getSize() * rectangleWidth) + rectangleWidth);
+                    markDownNodeLocation(btNode, rectangleX, recttangleY, findChildIndex(btNode.getFather(), btNode));
+                    // rectangleX += ((tmpList.get(i).getSize() * rectangleWidth) * 3);
+                   //  rectangleX += ((tmpList.get(i).getSize() * rectangleWidth) + rectangleWidth);
                 }
 
             }
@@ -126,20 +127,40 @@ public class PersistenceBTreePane extends Pane {
         }
     }
 
+    /**
+     * 查找子节点是父节点的第几个child
+     *
+     * @param parent 父节点
+     * @param child 子节点
+     * @return 子节点下标
+     */
+    private int findChildIndex(BTNode<String> parent, BTNode<String> child) {
+        if (parent == null) {
+            return -1;
+        }
+        List<BTNode<String>> children = parent.getChildren();
+        for (int i = 0; i < children.size(); i++) {
+            if (parent.getChild(i) == child) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private void drawLines() {
         Iterator<BTNode<String>> iterator = nodeLocationMap.keySet().iterator();
         while (iterator.hasNext()) {
             BTNode<String> child = iterator.next();
             if (child.getFather() != null) {
                 int[] childLocation = nodeLocationMap.get(child);
-                int startY0 = childLocation[1];
-                int startX0 = childLocation[0] + child.getSize() * rectangleWidth / 2;
+                int startY0 = childLocation[1]; // 子节点Y坐标
+                int startX0 = childLocation[0] + child.getSize() * rectangleWidth / 2; // 子节点中点横坐标
 
                 BTNode<String> parent = child.getFather();
                 int[] parentLocation = nodeLocationMap.get(parent);
 
                 int childIndex = childLocation[2];
-                int startY1 = parentLocation[1] + rectangleWidth;
+                int startY1 = parentLocation[1] + rectangleWidth; // 父节点Y坐标
 
                 int startX1 = parentLocation[0] + childIndex * rectangleWidth;
 
