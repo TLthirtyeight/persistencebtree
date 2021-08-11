@@ -1,5 +1,7 @@
 package com.ysq.persistencebtree.visualizer.application;
 
+import com.pdfjet.PDF;
+import com.sun.javafx.robot.impl.FXRobotHelper;
 import com.ysq.persistencebtree.mvstore.MVMap;
 import com.ysq.persistencebtree.mvstore.MVStore;
 import com.ysq.persistencebtree.mvstore.Page;
@@ -9,17 +11,25 @@ import com.ysq.persistencebtree.visualizer.visual.PersistenceBTreePane;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.*;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -33,6 +43,10 @@ public class PersistenceBtreeApp extends Application {
 
     private BTNode<String> rootNode = new BTNode<>();
 
+    private ScrollPane scrollPane = new ScrollPane();
+
+    private PersistenceBTreePane persistenceBTreePane;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         final int windowHeight = 1040;
@@ -45,7 +59,11 @@ public class PersistenceBtreeApp extends Application {
         BorderPane.setMargin(hBox, new Insets(10, 10, 10, 10));
         Button loadButton = new Button("load");
         Button showButton = new Button("show");
+        Button exportButton = new Button("export");
 
+        FileChooser fileChooser1 = new FileChooser();
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.pdf)", "*.pdf");
+        fileChooser1.getExtensionFilters().add(extFilter);
 
         h2StoreFile.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -56,7 +74,7 @@ public class PersistenceBtreeApp extends Application {
 
         FileChooser fileChooser = new FileChooser();
 
-        hBox.getChildren().addAll(new Label("请选择H2存储文件:"), h2StoreFile, loadButton, showButton);
+        hBox.getChildren().addAll(new Label("请选择H2存储文件:"), h2StoreFile, loadButton, showButton, exportButton);
         hBox.setAlignment(Pos.CENTER);
 
 
@@ -80,9 +98,7 @@ public class PersistenceBtreeApp extends Application {
             BPlusTree<String> bTree = initBtree(h2StoreFile.getText());
             //BPlusTree<String> bTree = initBtree2(3, 3);
 
-            ScrollPane scrollPane = new ScrollPane();
-
-            PersistenceBTreePane persistenceBTreePane = new PersistenceBTreePane(windowWidth / 2, 50, bTree);
+            persistenceBTreePane = new PersistenceBTreePane(windowWidth / 2, 50, bTree);
 
             // 去掉 persistenceBTreePane.setPrefSize(windowWidth, windowHeight);
             persistenceBTreePane.drawBTree(bTree.getRoot(), windowWidth / 2, 80);
@@ -90,6 +106,73 @@ public class PersistenceBtreeApp extends Application {
             scrollPane.setContent(persistenceBTreePane);
             scrollPane.autosize();
             root.setCenter(scrollPane);
+
+        });
+
+        exportButton.setOnAction((e) -> {
+//            try {
+//
+//                WritableImage image = new WritableImage(5000, 3000);
+//                persistenceBTreePane.snapshot(null, image);
+//                File file = new File("C:\\Users\\ysq\\Desktop\\btree.png");
+//                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+//            } catch (IOException ioException) {
+//                ioException.printStackTrace();
+//            }
+
+
+            try {
+                double totalWidth = persistenceBTreePane.getWidth();
+                double totalHeight = persistenceBTreePane.getHeight();
+
+                double scrollPaneWidth = scrollPane.getWidth();
+                double scrollPaneHeight = scrollPane.getHeight();
+
+                int widthLoop = (int) (totalWidth / scrollPaneWidth);
+                int heightLoop = (int) (totalHeight / scrollPaneHeight);
+
+                int startX = 0, startY = 0;
+                int picCount = 0;
+                for (int i = 0; i < heightLoop + 1; i++) {
+                    for (int j = 0; j < widthLoop + 1; j++) {
+                        startX = j * (int) scrollPaneWidth;
+                        startY = i * (int) scrollPaneHeight;
+                        String filePath = "C:\\Users\\ysq\\Desktop\\test\\" + picCount + ".png";
+                        File file = new File(filePath);
+
+                        Rectangle2D rectangle2D = new Rectangle2D(startX, startY, scrollPane.getWidth(), scrollPane.getHeight());
+                        SnapshotParameters snapshotParameters = new SnapshotParameters();
+                        snapshotParameters.setViewport(rectangle2D);
+                        BufferedImage bufImage = SwingFXUtils.fromFXImage(persistenceBTreePane.snapshot(snapshotParameters, null), null);
+                        FileOutputStream out = new FileOutputStream(file);
+                        ImageIO.write(bufImage, "png", out);
+                        out.flush();
+                        out.close();
+                        picCount++;
+                    }
+                }
+
+
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+
+
+//            try {
+//
+//
+//                File file = fileChooser1.showSaveDialog(primaryStage);
+//                if (file == null)
+//                    return;
+//                if(file.exists()){//文件已存在，则删除覆盖文件
+//                    file.delete();
+//                }
+//                String exportFilePath = file.getAbsolutePath();
+//
+//            } catch(Exception exception) {
+//
+//            }
+
         });
 
         // Create a scene
@@ -286,7 +369,7 @@ public class PersistenceBtreeApp extends Application {
     /**
      * 根据每个节点的阶数和层数构造数
      *
-     * @param m 阶数，每个节点的key数
+     * @param m     阶数，每个节点的key数
      * @param level 层数
      * @return B+树
      */

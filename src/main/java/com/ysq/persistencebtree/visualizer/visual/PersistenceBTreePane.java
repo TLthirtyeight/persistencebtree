@@ -20,7 +20,7 @@ public class PersistenceBTreePane extends Pane {
     private final int fontSize = 14;
     private final int rectangleWidth = 40;
 
-    private final int levelVerticalDist = 30 * rectangleWidth;
+    private final int levelVerticalDist = 12 * rectangleWidth;
 
     private final int levelPaddingLeftDist = 5 * rectangleWidth;
 
