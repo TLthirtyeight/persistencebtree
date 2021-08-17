@@ -69,7 +69,7 @@ public class Main extends Application {
 
 		// Create a scene
 		Scene scene = new Scene(root, 720, 360);
-		scene.getStylesheets().add(getClass().getResource("com.ysq.persistencebtree.visualizer.application/BtreeStyle.css").toExternalForm());
+		scene.getStylesheets().add(getClass().getResource("BtreeStyle.css").toExternalForm());
 		primaryStage.setTitle("B-Tree Visualization");
 		primaryStage.setScene(scene);
 		primaryStage.show();

@@ -1,7 +1,9 @@
 package com.ysq.persistencebtree.visualizer.algo;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class BTNode<E extends Comparable<E>> implements Serializable {
     private static final long serialVersionUID = 987654321;
@@ -132,5 +134,38 @@ public class BTNode<E extends Comparable<E>> implements Serializable {
      */
     public int getSize() {
         return keys.size();
+    }
+
+    public int binarySearch(E key) {
+        if (isNumeric((String)key)) {
+            int low = 0;
+            int high = keys.size() - 1;
+            int mid = -1;
+            while (low <= high) {
+                // int compare = key.compareTo(storage[x]);
+                mid = (low + high) >>> 1;
+                int compare = Integer.parseInt((String) key) - Integer.parseInt((String) keys.get(mid));
+                if (compare == 0) {
+                    return mid;
+                }
+                if (compare < 0) {
+                    high = mid - 1;
+                } else if (compare > 0){
+                    low = mid + 1;
+                }
+            }
+            return -(low + 1);
+        }
+       return Collections.binarySearch(keys, key);
+    }
+
+    private boolean isNumeric(String str) {
+        String bigStr;
+        try {
+            bigStr = new BigDecimal(str).toString();
+        } catch (Exception e) {
+            return false;//异常 说明包含非数字。
+        }
+        return true;
     }
 }

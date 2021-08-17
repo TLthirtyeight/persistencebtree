@@ -48,7 +48,7 @@ public class PersistenceBTreePane extends Pane {
         this.getChildren().addAll(rect, txt);
     }
 
-    private void drawNode(BTNode<String> node, double x, double y, Color color) {
+    public void drawNode(BTNode<String> node, double x, double y, Color color) {
         for (int i = 0; i < node.getKeys().size(); i++) {
             String s = node.getKey(i);
             Rectangle rect = new Rectangle(x, y, rectangleWidth, rectangleWidth);
@@ -147,7 +147,7 @@ public class PersistenceBTreePane extends Pane {
         return -1;
     }
 
-    private void drawLines() {
+    public void drawLines() {
         Iterator<BTNode<String>> iterator = nodeLocationMap.keySet().iterator();
         while (iterator.hasNext()) {
             BTNode<String> child = iterator.next();
@@ -172,8 +172,29 @@ public class PersistenceBTreePane extends Pane {
         }
     }
 
+    public void drawLine(BTNode<String> child, BTNode<String> parent, Color color) {
+        int[] childLocation = nodeLocationMap.get(child);
+        int startY0 = childLocation[1]; // 子节点Y坐标
+        int startX0 = childLocation[0] + child.getSize() * rectangleWidth / 2; // 子节点中点横坐标
+
+        int[] parentLocation = nodeLocationMap.get(parent);
+
+        int childIndex = childLocation[2];
+        int startY1 = parentLocation[1] + rectangleWidth; // 父节点Y坐标
+
+        int startX1 = parentLocation[0] + childIndex * rectangleWidth;
+
+        Line line = new Line(startX0, startY0, startX1, startY1);
+        line.setStroke(color);
+        line.setStrokeWidth(2.5);
+        this.getChildren().add(line);
+    }
+
     private void markDownNodeLocation(BTNode<String> btNode, int rectangleX, int recttangleY, int childIndex) {
         nodeLocationMap.put(btNode, new int[]{rectangleX, recttangleY, childIndex});
     }
 
+    public int[] findBTNodePosition(BTNode<String> btNode) {
+        return nodeLocationMap.get(btNode);
+    }
 }

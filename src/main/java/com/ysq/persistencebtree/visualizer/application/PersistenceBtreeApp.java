@@ -7,6 +7,8 @@ import com.ysq.persistencebtree.mvstore.MVStore;
 import com.ysq.persistencebtree.mvstore.Page;
 import com.ysq.persistencebtree.visualizer.algo.BPlusTree;
 import com.ysq.persistencebtree.visualizer.algo.BTNode;
+import com.ysq.persistencebtree.visualizer.algo.SearchingChain;
+import com.ysq.persistencebtree.visualizer.ulti.ImageMergeUtil;
 import com.ysq.persistencebtree.visualizer.visual.PersistenceBTreePane;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -22,6 +24,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -45,7 +48,13 @@ public class PersistenceBtreeApp extends Application {
 
     private ScrollPane scrollPane = new ScrollPane();
 
+    private TextField searchTextField = new TextField();
+
     private PersistenceBTreePane persistenceBTreePane;
+
+    private BPlusTree<String> bTree;
+
+    private SearchingChain<String> searchingChain;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -61,9 +70,9 @@ public class PersistenceBtreeApp extends Application {
         Button showButton = new Button("show");
         Button exportButton = new Button("export");
 
-        FileChooser fileChooser1 = new FileChooser();
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.pdf)", "*.pdf");
-        fileChooser1.getExtensionFilters().add(extFilter);
+
+        Button searchButton = new Button("search");
+
 
         h2StoreFile.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -74,7 +83,8 @@ public class PersistenceBtreeApp extends Application {
 
         FileChooser fileChooser = new FileChooser();
 
-        hBox.getChildren().addAll(new Label("请选择H2存储文件:"), h2StoreFile, loadButton, showButton, exportButton);
+        hBox.getChildren().addAll(new Label("请选择H2存储文件:"), h2StoreFile, loadButton, showButton,
+                exportButton, searchTextField, searchButton);
         hBox.setAlignment(Pos.CENTER);
 
 
@@ -95,7 +105,7 @@ public class PersistenceBtreeApp extends Application {
             if (!checkH2DBFile()) {
                 return;
             }
-            BPlusTree<String> bTree = initBtree(h2StoreFile.getText());
+            bTree = initBtree(h2StoreFile.getText());
             //BPlusTree<String> bTree = initBtree2(3, 3);
 
             persistenceBTreePane = new PersistenceBTreePane(windowWidth / 2, 50, bTree);
@@ -107,23 +117,24 @@ public class PersistenceBtreeApp extends Application {
             scrollPane.autosize();
             root.setCenter(scrollPane);
 
+
         });
 
         exportButton.setOnAction((e) -> {
-//            try {
-//
-//                WritableImage image = new WritableImage(5000, 3000);
-//                persistenceBTreePane.snapshot(null, image);
-//                File file = new File("C:\\Users\\ysq\\Desktop\\btree.png");
-//                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-//            } catch (IOException ioException) {
-//                ioException.printStackTrace();
-//            }
-
-
+            FileChooser fileChooser1 = new FileChooser();
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.png)", "*.png");
+            fileChooser1.getExtensionFilters().add(extFilter);
+            File savePictureFile = fileChooser1.showSaveDialog(primaryStage);
+            if (savePictureFile != null) {
+                System.out.println(savePictureFile.getParent());
+                System.out.println(savePictureFile.getName());
+            }
+            //https://blog.csdn.net/u011768325/article/details/37961907
             try {
-                double totalWidth = persistenceBTreePane.getWidth();
-                double totalHeight = persistenceBTreePane.getHeight();
+//                double totalWidth = persistenceBTreePane.getWidth();
+//                double totalHeight = persistenceBTreePane.getHeight();
+                double totalWidth = 50000;
+                double totalHeight = 3000;
 
                 double scrollPaneWidth = scrollPane.getWidth();
                 double scrollPaneHeight = scrollPane.getHeight();
@@ -133,11 +144,14 @@ public class PersistenceBtreeApp extends Application {
 
                 int startX = 0, startY = 0;
                 int picCount = 0;
+                List<List<Integer>> tmpPictures = new ArrayList<>();
                 for (int i = 0; i < heightLoop + 1; i++) {
+                    // 记录在同一行的图片序号
+                    List<Integer> picturesInARow = new ArrayList<>();
                     for (int j = 0; j < widthLoop + 1; j++) {
                         startX = j * (int) scrollPaneWidth;
                         startY = i * (int) scrollPaneHeight;
-                        String filePath = "C:\\Users\\ysq\\Desktop\\test\\" + picCount + ".png";
+                        String filePath = savePictureFile.getParent() + File.separator + picCount + ".png";
                         File file = new File(filePath);
 
                         Rectangle2D rectangle2D = new Rectangle2D(startX, startY, scrollPane.getWidth(), scrollPane.getHeight());
@@ -148,32 +162,27 @@ public class PersistenceBtreeApp extends Application {
                         ImageIO.write(bufImage, "png", out);
                         out.flush();
                         out.close();
+                        picturesInARow.add(picCount);
                         picCount++;
                     }
+                    tmpPictures.add(picturesInARow);
                 }
-
-
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
+                ImageMergeUtil.mergeAllPictures(tmpPictures, savePictureFile);
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
 
-
-//            try {
-//
-//
-//                File file = fileChooser1.showSaveDialog(primaryStage);
-//                if (file == null)
-//                    return;
-//                if(file.exists()){//文件已存在，则删除覆盖文件
-//                    file.delete();
-//                }
-//                String exportFilePath = file.getAbsolutePath();
-//
-//            } catch(Exception exception) {
-//
-//            }
-
         });
+
+        searchButton.setOnAction(e -> {
+            BTNode<String> btNode = null;
+            if (searchingChain != null) {
+                drawWithSearchingChain(searchingChain, Color.web("#6ab5ff"), Color.BLACK);
+            }
+            searchingChain = bTree.search(searchTextField.getText().trim());
+            drawWithSearchingChain(searchingChain, Color.RED, Color.AQUA);
+        });
+
 
         // Create a scene
         Scene scene = new Scene(root, 720, 360);
@@ -215,6 +224,20 @@ public class PersistenceBtreeApp extends Application {
         BPlusTree<String> bPlusTree = new BPlusTree<>();
         bPlusTree.setRoot(rootNode);
         return bPlusTree;
+    }
+
+    public void drawWithSearchingChain(SearchingChain<String> searchingChain, Color color, Color lineColor) {
+        BTNode<String> btNode = null;
+        List<BTNode<String>> btNodeList = new ArrayList<>();
+        while (searchingChain != null && (btNode = searchingChain.lastChild) != null) {
+            btNodeList.add(btNode);
+            int[] pos = persistenceBTreePane.findBTNodePosition(btNode);
+            persistenceBTreePane.drawNode(btNode, pos[0], pos[1], color);
+            searchingChain = searchingChain.parent;
+        }
+        for (int b = 0; b < btNodeList.size() - 1; b++) {
+            persistenceBTreePane.drawLine(btNodeList.get(b), btNodeList.get(b + 1), lineColor);
+        }
     }
 
     private void solve(Page page, BTNode<String> parent) {
